@@ -14,10 +14,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
     credentials: true,
-    origin: process.env.CLIENT_URL,
-    optionsSuccessStatus: 200,
-    methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version']
+    origin: process.env.CLIENT_URL
 }))
 app.use('/api', router)
 
