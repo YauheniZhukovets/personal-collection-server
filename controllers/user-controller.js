@@ -15,7 +15,6 @@ class UserController {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 sameSite: 'none',
                 secure: true,
-                httpOnly: true
             })
             return res.json(userData)
         } catch (e) {
@@ -31,7 +30,6 @@ class UserController {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 sameSite: 'none',
                 secure: true,
-                httpOnly: true
             })
             return res.json(userData)
         } catch (e) {
@@ -58,7 +56,6 @@ class UserController {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 sameSite: 'none',
                 secure: true,
-                httpOnly: true
             })
             return res.json(userData)
         } catch (e) {
