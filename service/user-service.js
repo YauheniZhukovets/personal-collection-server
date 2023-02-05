@@ -42,7 +42,6 @@ class UserService {
 
     async refresh(refreshToken){
         if(!refreshToken) {
-            console.log(`нет refresh токена в гыук сервисе`)
             throw ApiError.UnauthorizedError()
         }
         const userData = tokenService.validateRefreshToken(refreshToken)
