@@ -12,7 +12,7 @@ class UserController {
             }
             const {email, password} = req.body
             const userData = await userService.registration(email, password)
-            res.cookie('refreshToken', userData.refreshToken, {...configCookie.MONTH})
+            //res.cookie('refreshToken', userData.refreshToken, {...configCookie.MONTH})
             return res.json(userData)
         } catch (e) {
             next(e)
