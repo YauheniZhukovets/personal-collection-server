@@ -60,13 +60,13 @@ class ItemService {
             userId = userAuthorize._id
         }
         const titleReq = itemDate.title || undefined
-        const oldItem = await ItemModel.findById(itemDate._id).exec()
+        const oldItem = await ItemModel.findById(itemDate.itemId).exec()
         if (!oldItem) {
             throw ApiError.BadRequest('Айтем не найдена')
         }
         if (userId) {
             await ItemModel.findByIdAndUpdate(
-                itemDate._id,
+                itemDate.itemId,
                 {
                     title: titleReq || oldItem.title
                 }
@@ -76,8 +76,8 @@ class ItemService {
     }
 
     async deleteItem(userId, collectionId, itemId, userAuthorize) {
-        if (!collectionId || itemId || !userAuthorize) {
-            throw ApiError.BadRequest('Недостатточно данных для удаления айтема')
+        if (!collectionId || !itemId || !userAuthorize) {
+            throw ApiError.BadRequest('Недостаточно данных для удаления айтема')
         }
         let user_id
         if (!userId) {

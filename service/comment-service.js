@@ -23,7 +23,7 @@ class CommentService {
         if (!item) {
             throw ApiError.BadRequest('айтем не найден')
         }
-        const user = await UserModel.find({_id: userId})
+        const user = await UserModel.findOne({_id: userId})
         if(!user) {
             throw ApiError.BadRequest('Пользователь не найден в БД')
         }
@@ -31,7 +31,7 @@ class CommentService {
             throw ApiError.BadRequest('Текст коментария отсутсвует')
         }
         await CommentModel.create({item, user, text})
-        await ItemModel.findOneAndUpdate({_id: itemId}, {countComments: ++item.countComments})
+        await ItemModel.findOneAndUpdate(itemId, {countComments: ++item.countComments})
         const comments = await CommentModel.find({item: itemId}).populate('user')
         if (!comments) {
             throw ApiError.BadRequest('Коментарии не найдены')
@@ -43,7 +43,7 @@ class CommentService {
         if (!itemId || !commentId || !userId ) {
             throw ApiError.BadRequest('Айтем или коммент или пользователь не указаны')
         }
-        const user = await UserModel.find({_id: userId})
+        const user = await UserModel.findOne({_id: userId})
         if(!user) {
             throw ApiError.BadRequest('Пользователь не найден')
         }
@@ -75,7 +75,7 @@ class CommentService {
         if (!item) {
             throw ApiError.BadRequest('Айтем не найден')
         }
-        const user = await UserModel.find({_id: userId})
+        const user = await UserModel.findOne({_id: userId})
         if(!user) {
             throw ApiError.BadRequest('Пользователь не найден')
         }
