@@ -1,14 +1,18 @@
 const {Schema, model} = require('mongoose')
 
 const UserSchema = new Schema({
-        name: {type: String},
+        name: {type: String, unique: true, require: true},
         email: {type: String, unique: true, require: true},
         password: {type: String, require: true},
-        isAdmin: {type: Boolean, require: true},
-        isBlocked: {type: Boolean},
+        collectionsCount: {type: Number, default: 0},
+        isAdmin: {type: Boolean, default: false},
+        isBlocked: {type: Boolean, default: false},
     },
     {
-        timestamps: true
+        timestamps: {
+            createdAt: 'created',
+            updatedAt: 'updated',
+        }
     }
 )
 

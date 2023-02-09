@@ -1,7 +1,7 @@
 const {Schema, model} = require('mongoose')
 
 const CollectionSchema = new Schema({
-        userId: {
+        user: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
@@ -9,11 +9,14 @@ const CollectionSchema = new Schema({
         name: {type: String, required: true},
         theme: {type: String, required: true},
         description: {type: String, required: true},
-        itemCount: {type: Number, default: 0},
-        image: {type: String}
+        itemsCount: {type: Number, default: 0},
+        image: {type: String, default: ''}
     },
     {
-        timestamps: true
+        timestamps: {
+            createdAt: 'created',
+            updatedAt: 'updated',
+        }
     }
 )
 
