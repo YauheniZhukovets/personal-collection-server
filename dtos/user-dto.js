@@ -4,6 +4,9 @@ module.exports = class UserDto {
     _id
     isAdmin
     isBlocked
+    collectionsCount
+    created
+    updated
 
     constructor(model) {
         this.email = model.email
@@ -11,5 +14,8 @@ module.exports = class UserDto {
         this.name = model.name
         this.isAdmin = model.isAdmin
         this.isBlocked = model.isBlocked
+        this.collectionsCount = model.collectionsCount
+        this.created = model.created
+        this.updated = model.updated
     }
 }
