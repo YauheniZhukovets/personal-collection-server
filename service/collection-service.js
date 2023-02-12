@@ -7,18 +7,18 @@ class CollectionService {
         if (!userId) {
             throw ApiError.BadRequest('Не указан id пользователя коллекции')
         }
-        return CollectionModel.find({user: userId});
+        return CollectionModel.find({user: userId}).populate('user')
     }
 
-    async createCollection(collectionDate, userAuthorize) {
+    async createCollection(collectionDate, userAuthorize, id) {
         if (!collectionDate || !userAuthorize) {
             throw ApiError.BadRequest('Нет данных для создания коллекции')
         }
         let userId
-        if (collectionDate.userId === userAuthorize._id || userAuthorize.isAdmin) {
-            userId = collectionDate.userId
+        if (id === userAuthorize._id || userAuthorize.isAdmin) {
+            userId = id
         }
-        if (!collectionDate.userId) {
+        if (!id) {
             userId = userAuthorize._id
         }
         const user = await UserModel.findOne({_id: userId})
@@ -36,10 +36,10 @@ class CollectionService {
             .then((collectionCount) => {
                 UserModel.findByIdAndUpdate(user._id, {collectionsCount: collectionCount}, {new: true}).exec()
             })
-        return CollectionModel.find({user})
+        return CollectionModel.find({user}).populate('user')
     }
 
-    async updateCollection(collectionDate, userAuthorize) {
+    async updateCollection(collectionDate, userAuthorize, id) {
         if (!collectionDate || !userAuthorize) {
             throw ApiError.BadRequest('Нет данных для обнавления коллекции')
         }
@@ -48,11 +48,11 @@ class CollectionService {
         const descriptionReq = collectionDate.description || undefined
         const imageReq = collectionDate.image || undefined
         let userId
-        if (!collectionDate.userId) {
+        if (!id) {
             userId = userAuthorize._id
         }
-        if (collectionDate.userId === userAuthorize._id || userAuthorize.isAdmin) {
-            userId = collectionDate.userId
+        if (id === userAuthorize._id || userAuthorize.isAdmin) {
+            userId = id
         }
         const user = await UserModel.findOne({_id: userId})
         const oldCollection = await CollectionModel.findById(collectionDate._id).exec()
@@ -70,7 +70,7 @@ class CollectionService {
                 }
             )
         }
-        return CollectionModel.find({user})
+        return CollectionModel.find({user}).populate('user')
     }
 
     async deleteCollection(userId, collectionId, userAuthorize) {
@@ -96,7 +96,7 @@ class CollectionService {
             .then((collectionCount) => {
                 UserModel.findByIdAndUpdate(user._id, {collectionsCount: collectionCount}, {new: true}).exec()
             })
-        return CollectionModel.find({user})
+        return CollectionModel.find({user}).populate('user')
     }
 }
 

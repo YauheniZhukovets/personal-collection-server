@@ -5,7 +5,7 @@ class CollectionController {
         try {
             const {userId} = req.query
             const collections = await collectionService.getCollections(userId)
-            return res.json({collections})
+            return res.json([...collections])
         } catch (e) {
             next(e)
         }
@@ -13,10 +13,11 @@ class CollectionController {
 
     async createCollection(req, res, next) {
         const collectionDate = req.body
+        const {userId} = req.query
         const userAuthorize = req.user
         try {
-            const collections = await collectionService.createCollection(collectionDate, userAuthorize)
-            return res.json({collections})
+            const collections = await collectionService.createCollection(collectionDate, userAuthorize, userId)
+            return res.json([...collections])
         } catch (e) {
             next(e)
         }
@@ -24,10 +25,11 @@ class CollectionController {
 
     async updateCollection(req, res, next) {
         const collectionDate = req.body
+        const {userId} = req.query
         const userAuthorize = req.user
         try {
-            const collections = await collectionService.updateCollection(collectionDate, userAuthorize)
-            return res.json({collections})
+            const collections = await collectionService.updateCollection(collectionDate, userAuthorize, userId)
+            return res.json([...collections])
         } catch (e) {
             next(e)
         }
@@ -38,7 +40,7 @@ class CollectionController {
             const {userId, collectionId} = req.query
             const userAuthorize = req.user
             const collections = await collectionService.deleteCollection(userId, collectionId, userAuthorize)
-            return res.json({collections})
+            return res.json([...collections])
         } catch (e) {
             next(e)
         }
