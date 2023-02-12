@@ -27,6 +27,23 @@ class UserService {
         return allUsers.map(u => new UserDto(u))
     }
 
+    async removeAdmin(ids) {
+        if (ids.length === 0) {
+            throw ApiError.BadRequest('Нет id')
+        }
+        await UserModel.updateMany({_id: {$in: ids}}, {$set: {isAdmin: false}}, {multi: true})
+        const allUsers = await UserModel.find()
+        return allUsers.map(u => new UserDto(u))
+    }
+    async addAdmin(ids) {
+        if (ids.length === 0) {
+            throw ApiError.BadRequest('Нет id')
+        }
+        await UserModel.updateMany({_id: {$in: ids}}, {$set: {isAdmin: true}}, {multi: true})
+        const allUsers = await UserModel.find()
+        return allUsers.map(u => new UserDto(u))
+    }
+
     async deleteUser(ids) {
         if (ids.length === 0) {
             throw ApiError.BadRequest('Нет id')

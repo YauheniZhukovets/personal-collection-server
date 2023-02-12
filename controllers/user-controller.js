@@ -31,6 +31,27 @@ class UserController {
         }
     }
 
+    async removeAdmin(req, res, next) {
+        try {
+            const {ids} = req.body
+            const users = await userService.removeAdmin(ids)
+            return res.json(users)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async addAdmin(req, res, next) {
+        try {
+            const {ids} = req.body
+            const users = await userService.addAdmin(ids)
+            return res.json(users)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+
     async deleteUser(req, res, next) {
         try {
             const {ids} = req.body
