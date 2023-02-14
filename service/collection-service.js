@@ -46,7 +46,8 @@ class CollectionService {
         const nameReq = collectionDate.name || undefined
         const themeReq = collectionDate.theme || undefined
         const descriptionReq = collectionDate.description || undefined
-        const imageReq = collectionDate.image || undefined
+        const imageReq = collectionDate.image
+
         let userId
         if (!id) {
             userId = userAuthorize._id
@@ -66,7 +67,7 @@ class CollectionService {
                     name: nameReq || oldCollection.name,
                     theme: themeReq || oldCollection.theme,
                     description: descriptionReq || oldCollection.description,
-                    image: imageReq === null ? null : oldCollection.image
+                    image: imageReq === null ? null : imageReq ? imageReq : oldCollection.image
                 }
             )
         }
