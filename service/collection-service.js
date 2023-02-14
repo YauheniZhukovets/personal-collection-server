@@ -26,7 +26,7 @@ class CollectionService {
         const theme = collectionDate.theme || 'No theme'
         const description = collectionDate.description || ''
         const image = collectionDate.image || ''
-        if(userId) {
+        if (userId) {
             await CollectionModel.create({
                 user, name, theme, description, image, created: new Date(), updated: new Date()
             })
@@ -59,14 +59,14 @@ class CollectionService {
         if (!oldCollection) {
             throw ApiError.BadRequest('Коллекция не найдена')
         }
-        if(userId) {
+        if (userId) {
             await CollectionModel.findByIdAndUpdate(
                 collectionDate._id,
                 {
                     name: nameReq || oldCollection.name,
                     theme: themeReq || oldCollection.theme,
                     description: descriptionReq || oldCollection.description,
-                    image: imageReq === '' ? '' : oldCollection.image
+                    image: imageReq === null ? null : oldCollection.image
                 }
             )
         }
