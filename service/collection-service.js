@@ -66,7 +66,7 @@ class CollectionService {
                     name: nameReq || oldCollection.name,
                     theme: themeReq || oldCollection.theme,
                     description: descriptionReq || oldCollection.description,
-                    image: imageReq || oldCollection.image
+                    image: imageReq ?? oldCollection.image
                 }
             )
         }
