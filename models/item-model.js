@@ -20,66 +20,21 @@ const ItemSchema = new Schema({
             {type: Object}
         ],
 
-        string1: {
-            name: {type: String, default: ''},
-            value: {type: String, default: null}
-        },
-        string2: {
-            name: {type: String, default: ''},
-            value: {type: String, default: null}
-        },
-        string3: {
-            name: {type: String, default: ''},
-            value: {type: String, default: null}
-        },
-        text1: {
-            name: {type: String, default: ''},
-            value: {type: String, default: null}
-        },
-        text2: {
-            name: {type: String, default: ''},
-            value: {type: String, default: null}
-        },
-        text3: {
-            name: {type: String, default: ''},
-            value: {type: String, default: null}
-        },
-        number1: {
-            name: {type: String, default: ''},
-            value: {type: Number, default: null}
-        },
-        number2: {
-            name: {type: String, default: ''},
-            value: {type: Number, default: null}
-        },
-        number3: {
-            name: {type: String, default: ''},
-            value: {type: Number, default: null}
-        },
-        boolean1: {
-            name: {type: String, default: ''},
-            value: {type: Boolean, default: null}
-        },
-        boolean2: {
-            name: {type: String, default: ''},
-            value: {type: Boolean, default: null}
-        },
-        boolean3: {
-            name: {type: String, default: ''},
-            value: {type: Boolean, default: null}
-        },
-        date1: {
-            name: {type: String, default: ''},
-            value: {type: Date, default: null}
-        },
-        date2: {
-            name: {type: String, default: ''},
-            value: {type: Date, default: null}
-        },
-        date3: {
-            name: {type: String, default: ''},
-            value: {type: Date, default: null}
-        },
+        string1: {type: String},
+        string2: {type: String},
+        string3: {type: String},
+        text1: {type: String},
+        text2: {type: String},
+        text3: {type: String},
+        number1: {type: Number},
+        number2: {type: Number},
+        number3: {type: Number},
+        boolean1: {type: Boolean},
+        boolean2: {type: Boolean},
+        boolean3: {type: Boolean},
+        date1: {type: Date},
+        date2: {type: Date},
+        date3: {type: Date},
     },
     {
         timestamps: {

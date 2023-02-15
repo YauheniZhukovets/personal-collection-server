@@ -10,7 +10,8 @@ const CollectionSchema = new Schema({
         theme: {type: String, required: true},
         description: {type: String, required: true},
         itemsCount: {type: Number, default: 0},
-        image: {type: String, default: ''}
+        image: {type: String, default: ''},
+        fields: {type: Array, default: []}
     },
     {
         timestamps: {

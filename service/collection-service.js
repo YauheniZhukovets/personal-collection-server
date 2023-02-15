@@ -25,10 +25,11 @@ class CollectionService {
         const name = collectionDate.name || 'No name'
         const theme = collectionDate.theme || 'No theme'
         const description = collectionDate.description || ''
-        const image = collectionDate.image || ''
+        const image = collectionDate.image || null
+        const fields = collectionDate.fields || []
         if (userId) {
             await CollectionModel.create({
-                user, name, theme, description, image, created: new Date(), updated: new Date()
+                user, name, theme, description, image, fields, created: new Date(), updated: new Date()
             })
         }
         await CollectionModel.count({user})
@@ -46,6 +47,7 @@ class CollectionService {
         const nameReq = collectionDate.name || undefined
         const themeReq = collectionDate.theme || undefined
         const descriptionReq = collectionDate.description || undefined
+        const fieldsReq = collectionDate.fields || undefined
         const imageReq = collectionDate.image
 
         let userId
@@ -67,7 +69,8 @@ class CollectionService {
                     name: nameReq || oldCollection.name,
                     theme: themeReq || oldCollection.theme,
                     description: descriptionReq || oldCollection.description,
-                    image: imageReq === null ? null : imageReq ? imageReq : oldCollection.image
+                    image: imageReq === null ? null : imageReq ? imageReq : oldCollection.image,
+                    fields: fieldsReq || oldCollection.fields
                 }
             )
         }
