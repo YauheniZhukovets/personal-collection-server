@@ -5,7 +5,7 @@ class ItemController {
         try {
             const {collectionId, sortItem} = req.query
             const items = await itemService.getItems(collectionId, sortItem)
-            return res.json({items})
+            return res.json([...items])
         } catch (e) {
             next(e)
         }
@@ -16,7 +16,7 @@ class ItemController {
         const userAuthorize = req.user
         try {
             const items = await itemService.createItem(itemDate, userAuthorize)
-            return res.json({items})
+            return res.json([...items])
         } catch (e) {
             next(e)
         }
@@ -27,7 +27,7 @@ class ItemController {
         const userAuthorize = req.user
         try {
             const items = await itemService.updateItem(itemDate, userAuthorize)
-            return res.json({items})
+            return res.json([...items])
         } catch (e) {
             next(e)
         }
@@ -38,7 +38,7 @@ class ItemController {
         const userAuthorize = req.user
         try {
             const items = await itemService.deleteItem(userId, collectionId, itemId, userAuthorize)
-            return res.json({items})
+            return res.json([...items])
         } catch (e) {
             next(e)
         }

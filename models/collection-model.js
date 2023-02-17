@@ -11,7 +11,7 @@ const CollectionSchema = new Schema({
         description: {type: String, required: true},
         itemsCount: {type: Number, default: 0},
         image: {type: String, default: ''},
-        fields: {type: Array, default: []}
+        fields: {type: Array}
     },
     {
         timestamps: {

@@ -27,6 +27,7 @@ class CollectionService {
         const description = collectionDate.description || ''
         const image = collectionDate.image || null
         const fields = collectionDate.fields || []
+
         if (userId) {
             await CollectionModel.create({
                 user, name, theme, description, image, fields, created: new Date(), updated: new Date()
