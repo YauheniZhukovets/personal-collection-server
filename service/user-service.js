@@ -1,4 +1,6 @@
 const UserModel = require('../models/user-model')
+const CollectionModel = require('../models/collection-model')
+const ItemModel = require('../models/item-model')
 const UserDto = require('../dtos/user-dto')
 const ApiError = require('../exceptions/api-error')
 
@@ -49,6 +51,9 @@ class UserService {
             throw ApiError.BadRequest('Нет id')
         }
         await UserModel.deleteMany({_id: {$in: ids}}, {multi: true})
+        await CollectionModel.deleteMany({user: {$in: ids}}, {multi: true})
+        await ItemModel.deleteMany({user: {$in: ids}}, {multi: true})
+
         const allUsers = await UserModel.find()
         return allUsers.map(u => new UserDto(u))
     }
