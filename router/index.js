@@ -7,9 +7,11 @@ const likeRouter = require('./likeRouting')
 const collectionRouter = require('./collectinRouting')
 const itemRouter = require('./itemRouting')
 const userRouter = require('./userRouting')
+const mainRouter = require('./mainRouting')
 const roleMiddleware = require('../middlewares/role-middleware');
 
 router.use('/auth', authRouter)
+router.use('/all', mainRouter)
 router.use('/user', roleMiddleware, userRouter)
 router.use('/tags', tagRouter)
 router.use('/comment', commentRouter)

@@ -3,9 +3,19 @@ const itemService = require('../service/item-service')
 class ItemController {
     async getItems(req, res, next) {
         try {
-            const {collectionId, sortItem} = req.query
-            const items = await itemService.getItems(collectionId, sortItem)
+            const {collectionId, search, tags} = req.query
+            const items = await itemService.getItems(collectionId, search, tags)
             return res.json([...items])
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async getItem(req, res, next) {
+        try {
+            const {collectionId, itemId} = req.query
+            const item = await itemService.getItem(collectionId,itemId)
+            return res.json(item)
         } catch (e) {
             next(e)
         }

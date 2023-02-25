@@ -5,6 +5,6 @@ const router = new Router()
 
 
 router.post('/', authMiddleware, likeController.addLike)
-router.delete('/:itemId', authMiddleware, likeController.deleteLike)
+router.delete('/', authMiddleware, likeController.deleteLike)
 
 module.exports = router

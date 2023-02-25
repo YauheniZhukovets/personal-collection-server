@@ -4,7 +4,5 @@ const router = new Router()
 
 
 router.get('/', tagController.getTags)
-router.post('/', tagController.createTag)
-router.delete('/:id', tagController.deleteTag)
 
 module.exports = router

@@ -2,37 +2,69 @@ const ApiError = require('../exceptions/api-error')
 const ItemModel = require('../models/item-model');
 const CollectionModel = require('../models/collection-model');
 const UserModel = require('../models/user-model');
+const CommentModel = require('../models/comment-model')
+const TagModel = require('../models/tag-model')
 
 class ItemService {
-    async getItems(collectionId, sortItem) {
-        if (!collectionId) {
+    async getItems(collectionId, search, tags) {
+        if (!collectionId && !search && !tags) {
             throw ApiError.BadRequest('Не указаны данные для поиска')
         }
-        const sort = sortItem || ''
-        const sortName = (sort && sort.length > 2) ? sort.slice(1) : ''
-        const sortDirection = sortName ? (sort[0] === '0' ? -1 : 1) : undefined
-        const sorting = sortName ? {[sortName]: sortDirection} : {update: -1}
         const ownCollection = await CollectionModel.findById(collectionId).exec()
 
-        if (!ownCollection) {
+        if (collectionId && !ownCollection) {
             throw ApiError.BadRequest('Колекция не найдена')
         }
-        return ItemModel.find({collectionName: ownCollection}).sort(sorting).populate(['user', 'collectionName'])
+
+        if (search) {
+            const reg = new RegExp(search, 'gi')
+            const itemsFromItem = await ItemModel.find(
+                {$or: [{title: reg}, {tags: reg}, {string1: reg}, {string2: reg}, {string3: reg}, {text1: reg}, {text2: reg}, {text3: reg}]}
+            )
+            const itemsFromItemId = itemsFromItem.map(el => `${el._id}`)
+            const comments = await CommentModel.find({text: reg})
+            const commentsItemsId = comments.map(c => `${c.item}`)
+            const commonId = [...new Set([...itemsFromItemId, ...commentsItemsId])]
+
+            const commonItems = []
+            for (const id of commonId) {
+                const item = await ItemModel.findById(id)
+                commonItems.push(item)
+            }
+            return commonItems
+        }
+
+        if (tags) {
+            return ItemModel.find({tags: {$all: tags}})
+        }
+
+        return ItemModel.find({collectionName: ownCollection}).populate(['user', 'collectionName'])
+    }
+
+    async getItem(collectionId, itemId) {
+        if (!collectionId || !itemId) {
+            throw ApiError.BadRequest('Не указаны данные для поиска')
+        }
+        return ItemModel.findById(itemId).populate(['user', 'collectionName'])
     }
 
     async createItem(itemDate, userAuthorize) {
         if (!itemDate || !userAuthorize) {
             throw ApiError.BadRequest('Недостатточно данных для создания айтема')
         }
+
         const ownCollection = await CollectionModel.findById(itemDate.collectionId).exec()
+
         let userId
-        if (!ownCollection.user) {
+        if (!itemDate.userId) {
             userId = userAuthorize._id
         }
-        if (ownCollection.user === userAuthorize._id || userAuthorize.isAdmin) {
-            userId = ownCollection.user
+        if (itemDate.userId === userAuthorize._id || userAuthorize.isAdmin) {
+            userId = itemDate.userId
         }
+
         const user = await UserModel.findOne({_id: userId})
+
         const collectionName = ownCollection._id
         const title = itemDate.title || 'No name'
         const tags = itemDate.tags || []
@@ -45,19 +77,37 @@ class ItemService {
         const number1 = itemDate.number1 || null
         const number2 = itemDate.number2 || null
         const number3 = itemDate.number3 || null
-        const boolean1 = itemDate.boolean1 || null
-        const boolean2 = itemDate.boolean2 || null
-        const boolean3 = itemDate.boolean3 || null
+        const boolean1 = itemDate.boolean1
+        const boolean2 = itemDate.boolean2
+        const boolean3 = itemDate.boolean3
         const date1 = itemDate.date1 || null
         const date2 = itemDate.date2 || null
         const date3 = itemDate.date3 || null
+
+        if (tags.length) {
+            const oldTags = await TagModel.find({})
+            const oldTitleTags = oldTags.map(t => t.title)
+            const newTags = tags.filter(t => !oldTitleTags.includes(t)).map(t => {
+                return {title: t}
+            })
+
+            if (newTags.length) {
+                await TagModel.insertMany(newTags)
+            }
+        }
+
+        const foundTags = await TagModel.find({'title': {$in: tags}})
+        if (!foundTags) {
+            throw ApiError.BadRequest('Тэги не найдены')
+        }
+        const tagsFromDb = foundTags.length ? foundTags.map(t => t.title) : []
 
         if (userId) {
             await ItemModel.create({
                 user,
                 collectionName,
                 title,
-                tags,
+                tags: tagsFromDb,
                 string1,
                 string2,
                 string3,
@@ -82,35 +132,89 @@ class ItemService {
             .then((itemCount) => {
                 CollectionModel.findByIdAndUpdate(ownCollection._id, {itemsCount: itemCount}, {new: true}).exec()
             })
-        return ItemModel.find({collectionName: ownCollection}).populate(['user', 'collectionName'])
+        return ItemModel.find({collectionName: ownCollection._id}).populate(['user', 'collectionName'])
     }
 
     async updateItem(itemDate, userAuthorize) {
         if (!itemDate || !userAuthorize) {
             throw ApiError.BadRequest('Недостатточно данных для изменения айтема')
         }
-        const ownCollection = await CollectionModel.findById(itemDate.collectionName).exec()
+        const ownCollection = await CollectionModel.findById(itemDate.collectionId).exec()
         let userId
-        if (ownCollection.user === userAuthorize._id || userAuthorize.isAdmin) {
-            userId = ownCollection.user
+        if (itemDate.userId === userAuthorize._id || userAuthorize.isAdmin) {
+            userId = itemDate.userId
         }
-        if (!ownCollection.user) {
+        if (!itemDate.userId) {
             userId = userAuthorize._id
         }
+
         const titleReq = itemDate.title || undefined
-        const oldItem = await ItemModel.findById(itemDate._id).exec()
+        const tagsReq = itemDate.tags || undefined
+        const string1Req = itemDate.string1 || undefined
+        const string2Req = itemDate.string2 || undefined
+        const string3Req = itemDate.string3 || undefined
+        const text1Req = itemDate.text1 || undefined
+        const text2Req = itemDate.text2 || undefined
+        const text3Req = itemDate.text3 || undefined
+        const number1Req = itemDate.number1 || undefined
+        const number2Req = itemDate.number2 || undefined
+        const number3Req = itemDate.number3 || undefined
+        const boolean1Req = itemDate.boolean1 || undefined
+        const boolean2Req = itemDate.boolean2 || undefined
+        const boolean3Req = itemDate.boolean3 || undefined
+        const date1Req = itemDate.date1 || undefined
+        const date2Req = itemDate.date2 || undefined
+        const date3Req = itemDate.date3 || undefined
+
+
+        const oldItem = await ItemModel.findById(itemDate.itemId).exec()
         if (!oldItem) {
             throw ApiError.BadRequest('Айтем не найдена')
         }
+
+        if (tagsReq.length) {
+            const oldTags = await TagModel.find({})
+            const oldTitleTags = oldTags.map(t => t.title)
+            const newTags = tagsReq.filter(t => !oldTitleTags.includes(t)).map(t => {
+                return {title: t}
+            })
+
+            if (newTags.length) {
+                await TagModel.insertMany(newTags)
+            }
+        }
+
+        const foundTags = await TagModel.find({'title': {$in: tagsReq}})
+        if (!foundTags) {
+            throw ApiError.BadRequest('Тэги не найдены')
+        }
+        const tagsFromDb = foundTags.length ? foundTags.map(t => t.title) : []
+
         if (userId) {
             await ItemModel.findByIdAndUpdate(
-                itemDate._id,
+                itemDate.itemId,
                 {
-                    title: titleReq || oldItem.title
+                    title: titleReq || oldItem.title,
+                    tags: tagsFromDb || oldItem.tags,
+                    string1: string1Req || itemDate.string1,
+                    string2: string2Req || itemDate.string2,
+                    string3: string3Req || itemDate.string3,
+                    text1: text1Req || itemDate.text1,
+                    text2: text2Req || itemDate.text2,
+                    text3: text3Req || itemDate.text3,
+                    number1: number1Req || itemDate.number1,
+                    number2: number2Req || itemDate.number2,
+                    number3: number3Req || itemDate.number3,
+                    boolean1: boolean1Req || itemDate.boolean1,
+                    boolean2: boolean2Req || itemDate.boolean2,
+                    boolean3: boolean3Req || itemDate.boolean3,
+                    date1: date1Req || itemDate.date1,
+                    date2: date2Req || itemDate.date2,
+                    date3: date3Req || itemDate.date3,
                 }
             )
         }
-        return ItemModel.find({collectionName: ownCollection}).populate(['user', 'collectionName'])
+        return ItemModel.find({collectionName: ownCollection._id}).populate(['user', 'collectionName'])
     }
 
     async deleteItem(userId, collectionId, itemId, userAuthorize) {
