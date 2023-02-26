@@ -11,7 +11,7 @@ class TagService {
                 .exec()
                 .then((count) => finishTags.push({title: tag.title, count}))
         }
-        return finishTags.filter(t => t.count > 1)
+        return finishTags.filter(t => t.count > 0)
     }
 }
 
