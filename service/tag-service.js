@@ -4,7 +4,6 @@ const ItemModel = require('../models/item-model')
 class TagService {
     async getTags() {
         const tags = await TagModel.find({})
-
         const finishTags = []
         for (const tag of tags) {
             await ItemModel.count({tags: {$all: tag.title}})
