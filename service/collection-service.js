@@ -2,8 +2,7 @@ const ApiError = require('../exceptions/api-error')
 const CollectionModel = require('../models/collection-model')
 const UserModel = require('../models/user-model')
 const ItemModel = require('../models/item-model')
-const CommentModel = require('../models/comment-model')
-const LikeModel = require('../models/like-model')
+
 
 class CollectionService {
     async getCollections(userId) {
@@ -95,9 +94,7 @@ class CollectionService {
         const user = await UserModel.findOne({_id: user_id})
         if (userId) {
             await CollectionModel.findByIdAndDelete(collectionId)
-            await ItemModel.deleteMany({collectionId})
-            await CommentModel.deleteMany({collectionId})
-            await LikeModel.deleteMany({collectionId})
+            await ItemModel.deleteMany({collectionName: collectionId})
         }
         await CollectionModel.count({user})
             .exec()

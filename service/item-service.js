@@ -4,6 +4,7 @@ const CollectionModel = require('../models/collection-model');
 const UserModel = require('../models/user-model');
 const CommentModel = require('../models/comment-model')
 const TagModel = require('../models/tag-model')
+const LikeModel = require('../models/like-model')
 
 class ItemService {
     async getItems(collectionId, search, tags) {
@@ -229,10 +230,9 @@ class ItemService {
             user_id = userId
         }
         if (user_id) {
-            const item = await ItemModel.findByIdAndDelete(itemId)
-            if (!item) {
-                throw ApiError.BadRequest('Итем не найден')
-            }
+            await ItemModel.findByIdAndDelete(itemId)
+            await CommentModel.deleteMany({item: itemId})
+            await LikeModel.deleteMany({item: itemId})
         }
         await ItemModel.count({collectionName: collectionId})
             .exec()
