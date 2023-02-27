@@ -57,6 +57,24 @@ class AuthService {
         await tokenService.saveToken(userDto._id, tokens.refreshToken)
         return {...tokens, user: userDto}
     }
+
+    async success(user) {
+        if (!user) {
+            throw ApiError.BadRequest('Пользоватеь не найден(google)')
+        }
+        const hashPassword = await bcrypt.hash(user.emails[0].value.slice(0, 6), 3)
+        await UserModel.findOrCreate({email: user.emails[0].value},{
+            email: user.emails[0].value,
+            password: hashPassword,
+            name: user.name.givenName
+        })
+        const getUser = await UserModel.findOne({email: user.emails[0].value})
+        const userDto = new UserDto(getUser)
+        const tokens = tokenService.generateTokens({...userDto})
+        await tokenService.saveToken(userDto._id, tokens.refreshToken)
+        return {...tokens, user: userDto}
+    }
 }
+
 
 module.exports = new AuthService()

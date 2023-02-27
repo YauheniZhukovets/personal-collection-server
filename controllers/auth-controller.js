@@ -51,6 +51,22 @@ class AuthController {
             next(e)
         }
     }
+
+    async error(req, res, next) {
+        return next(ApiError.UnauthorizedError())
+    }
+
+    async success(req, res, next) {
+        const user = req.user
+        try {
+            const userData = await userService.success(user)
+            res.cookie('refreshToken', userData.refreshToken, {...configCookie.MONTH})
+            return res.json(userData)
+        } catch (e) {
+            next(e)
+        }
+    }
 }
 
 module.exports = new AuthController()
+
