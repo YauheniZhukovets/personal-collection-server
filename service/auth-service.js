@@ -58,18 +58,20 @@ class AuthService {
         return {...tokens, user: userDto}
     }
 
-    async success(user) {
-        if (!user) {
-            throw ApiError.BadRequest('Пользоватеь не найден(google)')
+    async googleOauthHandler(code) {
+        if (!code) {
+            throw ApiError.BadRequest('Authorization code not provided!')
         }
-        const hashPassword = await bcrypt.hash(user.emails[0].value.slice(0, 6), 3)
-        await UserModel.findOrCreate({email: user.emails[0].value},{
-            email: user.emails[0].value,
+        const {id_token, access_token} = await tokenService.getGoogleOauthToken({code})
+        const {name, email} = await tokenService.getGoogleUser({id_token, access_token})
+        const hashPassword = await bcrypt.hash(email.slice(0, 6), 3)
+        await UserModel.findOrCreate({email: email}, {
+            email: email,
             password: hashPassword,
-            name: user.name.givenName
+            name: name
         })
-        const getUser = await UserModel.findOne({email: user.emails[0].value})
-        const userDto = new UserDto(getUser)
+        const user = await UserModel.findOne({email: email})
+        const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({...userDto})
         await tokenService.saveToken(userDto._id, tokens.refreshToken)
         return {...tokens, user: userDto}

@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken')
 const tokenModel = require('../models/token-model')
+const axios = require('axios');
+const qs = require('qs');
+const ApiError = require('../exceptions/api-error');
 
 class TokenService {
     generateTokens(payload) {
@@ -46,6 +49,48 @@ class TokenService {
     async findToken(refreshToken) {
         const tokenData = await tokenModel.findOne({refreshToken})
         return tokenData
+    }
+
+    async getGoogleOauthToken({code}) {
+        const rootURl = 'https://oauth2.googleapis.com/token';
+
+        const options = {
+            code,
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET,
+            redirect_uri: process.env.CLIENT_GOOGLE_REDIRECT,
+            grant_type: 'authorization_code',
+        }
+        try {
+            const {data} = await axios.post(
+                rootURl,
+                qs.stringify(options),
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }
+            )
+            return data
+        } catch (e) {
+            throw ApiError.BadRequest('Failed to fetch Google Oauth Tokens')
+        }
+    }
+
+    async getGoogleUser({id_token, access_token}) {
+        try {
+            const {data} = await axios.get(
+                `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${id_token}`
+                    }
+                }
+            )
+            return data
+        } catch (err) {
+            throw ApiError.BadRequest('Failed to fetch User')
+        }
     }
 }
 

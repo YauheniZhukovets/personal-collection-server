@@ -52,18 +52,16 @@ class AuthController {
         }
     }
 
-    async error(req, res, next) {
-        return next(ApiError.UnauthorizedError())
-    }
-
-    async success(req, res, next) {
-        const user = req.user
+    async googleOauthHandler(req, res, next) {
+        const code = req.query.code
+        const pathUrl = req.query.state || '/'
         try {
-            const userData = await userService.success(user)
+            const userData = await userService.googleOauthHandler(code)
             res.cookie('refreshToken', userData.refreshToken, {...configCookie.MONTH})
-            return res.json(userData)
+            res.redirect(process.env.CLIENT_URL + `${pathUrl}`)
         } catch (e) {
             next(e)
+            res.redirect(process.env.CLIENT_URL + `${pathUrl}`)
         }
     }
 }
