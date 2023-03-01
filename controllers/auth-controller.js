@@ -61,20 +61,18 @@ class AuthController {
             res.redirect(process.env.CLIENT_URL + `${pathUrl}`)
         } catch (e) {
             next(e)
-            res.redirect(process.env.CLIENT_URL + `${pathUrl}`)
         }
     }
 
     async githubOauthHandler(req, res, next) {
         const code = req.query.code
-        const pathUrl = req.query.state ?? '/'
+        const pathUrl = req.query.state || '/'
         try {
             const userData = await userService.githubOauthHandler(code)
             res.cookie('refreshToken', userData.refreshToken, {...configCookie.MONTH})
             res.redirect(process.env.CLIENT_URL + `${pathUrl}`)
         } catch (e) {
             next(e)
-            res.redirect(process.env.CLIENT_URL + `${pathUrl}`)
         }
     }
 }
