@@ -76,6 +76,25 @@ class AuthService {
         await tokenService.saveToken(userDto._id, tokens.refreshToken)
         return {...tokens, user: userDto}
     }
+
+    async githubOauthHandler(code) {
+        if (!code) {
+            throw ApiError.BadRequest('Authorization github code not provided!')
+        }
+        const {access_token} = await tokenService.getGithubOathToken({code})
+        const {login, email} = await tokenService.getGithubUser({access_token})
+        const hashPassword = await bcrypt.hash(email.slice(0, 6), 3)
+        await UserModel.findOrCreate({email: email}, {
+            email: email,
+            password: hashPassword,
+            name: login
+        })
+        const user = await UserModel.findOne({email: email})
+        const userDto = new UserDto(user)
+        const tokens = tokenService.generateTokens({...userDto})
+        await tokenService.saveToken(userDto._id, tokens.refreshToken)
+        return {...tokens, user: userDto}
+    }
 }
 
 

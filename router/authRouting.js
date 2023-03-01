@@ -13,5 +13,6 @@ router.post('/login', authController.login)
 router.post('/logout', authController.logout)
 router.get('/refresh', authController.refresh)
 router.get('/google', authController.googleOauthHandler)
+router.get('/github', authController.githubOauthHandler)
 
 module.exports = router

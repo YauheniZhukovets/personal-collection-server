@@ -92,6 +92,46 @@ class TokenService {
             throw ApiError.BadRequest('Failed to fetch User')
         }
     }
+
+    async getGithubOathToken({code}) {
+        const rootUrl = 'https://github.com/login/oauth/access_token';
+        const options = {
+            client_id: process.env.GITHUB_CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET,
+            code,
+        }
+        const queryString = qs.stringify(options);
+
+        try {
+            const {data} = await axios.post(`${rootUrl}?${queryString}`, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            })
+
+            const decoded = qs.parse(data)
+
+            return decoded
+        } catch (e) {
+            throw ApiError.BadRequest('Failed to fetch GitHub Oauth Tokens')
+        }
+    }
+
+    async getGithubUser({access_token}) {
+        try {
+            const {data} = await axios.get(
+                'https://api.github.com/user',
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`
+                    }
+                }
+            )
+            return data
+        } catch (err) {
+            throw ApiError.BadRequest('Failed to fetch User')
+        }
+    }
 }
 
 module.exports = new TokenService()
